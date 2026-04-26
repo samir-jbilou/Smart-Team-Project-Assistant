@@ -1,15 +1,12 @@
 package com.samir.backend.entity;
 
+import com.samir.backend.entity.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
 @Table(name = "users")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class User {
 
     @Id
@@ -25,5 +22,6 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    private String role; // ex: ADMIN, MEMBER
+    @Enumerated(EnumType.STRING)
+    private UserRole role; // Utilise maintenant l'Enum conforme au CDC
 }
