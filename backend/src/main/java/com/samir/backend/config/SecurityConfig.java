@@ -35,8 +35,8 @@ public class SecurityConfig {
 
                 // 3. Configuration des accès
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/users/**").permitAll()
+                        .requestMatchers("/auth/**", "/api/auth/**").permitAll()
+                        .requestMatchers("/users/**", "/api/users/**").permitAll()
                         .anyRequest().authenticated()
                 );
 
