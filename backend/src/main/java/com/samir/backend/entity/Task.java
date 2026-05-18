@@ -1,7 +1,9 @@
+// Task.java
 package com.samir.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "tasks")
@@ -17,6 +19,15 @@ public class Task {
 
     private String description;
 
+    private LocalDate startDate;
+    private LocalDate endDate;
+
+    @Column(name = "depends_on_task_id")
+    private Long dependsOnTaskId;
+
+    @Column(name = "parent_task_id")
+    private Long parentTaskId;
+
     private Float estimatedHours = 0.0f;
     private Float consumedHours = 0.0f;
     private Float remainingHours = 0.0f;
@@ -26,6 +37,13 @@ public class Task {
 
     private String status;
 
+    @Column(name = "required_skill")
+    private String requiredSkill;
+
+    // --- NOUVEAU : Message du développeur vers le chef ---
+    @Column(columnDefinition = "TEXT")
+    private String developerComment;
+
     @ManyToOne
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
@@ -33,6 +51,9 @@ public class Task {
     @ManyToOne
     @JoinColumn(name = "assigned_user_id")
     private User assignedTo;
+
+    @Transient
+    private String blockingTaskName;
 
     public float getCalculatedProgress() {
         float cHours = (this.consumedHours != null) ? this.consumedHours : 0.0f;

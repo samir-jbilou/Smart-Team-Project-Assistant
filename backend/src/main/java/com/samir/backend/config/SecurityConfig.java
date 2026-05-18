@@ -24,10 +24,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // 1. Désactive CSRF (obligatoire pour les APIs REST)
+                // 1. Desactive CSRF (obligatoire pour les APIs REST)
                 .csrf(csrf -> csrf.disable())
 
-                // AJOUT ICI : Pour supporter les requêtes "Preflight" des apps mobiles
+                // Pour supporter les requetes "Preflight" des apps mobiles
                 .cors(org.springframework.security.config.Customizer.withDefaults())
 
                 // 2. Désactive la gestion des sessions (on utilise JWT)

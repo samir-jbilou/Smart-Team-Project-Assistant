@@ -1,6 +1,8 @@
+// Project.java
 package com.samir.backend.entity;
 
-import com.samir.backend.entity.enums.ProjectMethodology; // Import de l'Enum
+import com.samir.backend.entity.enums.ProjectMethodology;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
@@ -23,10 +25,8 @@ public class Project {
     private LocalDate endDate;
     private String status;
 
-    // --- AJOUT CONFORME AU CAHIER DES CHARGES ---
     @Enumerated(EnumType.STRING)
-    private ProjectMethodology methodology; // Correspond à MethodEnum [cite: 106]
-    // --------------------------------------------
+    private ProjectMethodology methodology;
 
     @ManyToOne
     @JoinColumn(name = "owner_id", nullable = false)
@@ -38,10 +38,14 @@ public class Project {
             joinColumns = @JoinColumn(name = "project_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    @Builder.Default // Indique à Lombok de garder l'initialisation par défaut
+    @Builder.Default
     private List<User> members = new java.util.ArrayList<>();
 
-    // Tes getters/setters manuels (au cas où Lombok tarde à compiler)
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    @Builder.Default
+    private List<Task> tasks = new java.util.ArrayList<>();
+
     public void setOwner(User owner) { this.owner = owner; }
     public User getOwner() { return owner; }
 }

@@ -1,3 +1,4 @@
+// TaskController.java
 package com.samir.backend.controller;
 
 import com.samir.backend.entity.Task;
@@ -8,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/tasks")
@@ -22,46 +24,28 @@ public class TaskController {
         return taskService.getAllTasks();
     }
 
-    /**
-     * Pour le Chef de Projet : Suivre l'avancement d'un projet spécifique (Fig. 1)
-     */
     @GetMapping("/project/{projectId}")
     public List<Task> getTasksByProject(@PathVariable Long projectId) {
         return taskService.getTasksByProject(projectId);
     }
 
-    /**
-     * Pour le Membre : Consulter ses propres tâches via son Token JWT (Fig. 1)
-     */
     @GetMapping("/my-tasks")
     public List<Task> getMyTasks(@AuthenticationPrincipal UserDetails userDetails) {
         return taskService.getTasksByUser(userDetails.getUsername());
     }
 
-    /**
-     * Time-tracking : Saisie des heures consommées (H) et du RAF (Fig. 2 et 4)
-     */
     @PutMapping("/{id}/progress")
     public Task updateProgress(
             @PathVariable Long id,
             @RequestParam float consumed,
-            @RequestParam float remaining) {
-        return taskService.updateTaskHours(id, consumed, remaining);
+            @RequestParam float remaining,
+            @RequestParam(required = false) String comment) { // CORRECTION ICI
+        return taskService.updateTaskHours(id, consumed, remaining, comment);
     }
 
-    /**
-     * Synchronisation PrevisionIA : Enregistre les prédictions calculées par le smartphone.
-     * Permet au Chef de Projet de voir les alertes (Proba > 75%) et suggestions d'IA.
-     */
-    @PutMapping("/{id}/ai-update")
-    public Task updateAIResults(
-            @PathVariable Long id,
-            @RequestParam float probability,
-            @RequestParam String suggestion) {
-        Task task = taskService.getTaskById(id);
-        task.setFailureProbability(probability);
-        task.setIaSuggestion(suggestion);
-        return taskService.createTask(task); // Enregistre les nouveaux champs IA
+    @PostMapping("/metrics/federated")
+    public void receiveFederatedMetrics(@RequestBody Map<String, Object> metrics) {
+        taskService.saveFederatedMetrics(metrics);
     }
 
     @GetMapping("/{id}")
@@ -72,6 +56,25 @@ public class TaskController {
     @PostMapping
     public Task createTask(@RequestBody Task task) {
         return taskService.createTask(task);
+    }
+
+    @PutMapping("/{id}")
+    public Task updateTask(@PathVariable Long id, @RequestBody Task taskDetails) {
+        Task existingTask = taskService.getTaskById(id);
+        existingTask.setTitle(taskDetails.getTitle());
+        existingTask.setDescription(taskDetails.getDescription());
+        existingTask.setEstimatedHours(taskDetails.getEstimatedHours());
+        existingTask.setRequiredSkill(taskDetails.getRequiredSkill());
+
+        existingTask.setStartDate(taskDetails.getStartDate());
+        existingTask.setEndDate(taskDetails.getEndDate());
+        existingTask.setDependsOnTaskId(taskDetails.getDependsOnTaskId());
+        existingTask.setParentTaskId(taskDetails.getParentTaskId());
+
+        if (taskDetails.getAssignedTo() != null) {
+            existingTask.setAssignedTo(taskDetails.getAssignedTo());
+        }
+        return taskService.createTask(existingTask);
     }
 
     @DeleteMapping("/{id}")
