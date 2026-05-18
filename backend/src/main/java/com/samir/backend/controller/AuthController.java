@@ -1,4 +1,3 @@
-// AuthController.java
 package com.samir.backend.controller;
 
 import com.samir.backend.dto.AuthResponse;
@@ -18,7 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping({"/api/auth", "/auth"})
 @CrossOrigin(origins = "*")
 public class AuthController {
 
